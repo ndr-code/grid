@@ -258,6 +258,16 @@ function App() {
               setShowNotesDialog(true);
             }
           }}
+          onMusicWidgetClick={() => {
+            if (!editMode) {
+              setShowMusicDialog(true);
+            }
+          }}
+          onRadioWidgetClick={() => {
+            if (!editMode) {
+              setShowRadioDialog(true);
+            }
+          }}
           onMouseDown={(e, boxId) => {
             if (e.button === 0 && editMode) {
               e.preventDefault();

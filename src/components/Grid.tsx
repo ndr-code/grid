@@ -4,6 +4,8 @@ import { BOX_SIZE, GAP } from '../constants';
 import { Clock } from './Clock';
 import { Pomodoro } from './Pomodoro';
 import { Notes } from './Notes';
+import MusicWidget from './MusicWidget';
+import RadioWidget from './RadioWidget';
 
 interface GridProps {
   boxes: GridBox[];
@@ -34,7 +36,9 @@ interface GridProps {
   onAssignWidgetByDrag?: (boxId: string, widgetType: string) => void;
   onClockWidgetClick: (boxId: string) => void;
   onPomodoroWidgetClick: (boxId: string) => void;
-  onNotesWidgetClick: (boxId: string) => void;
+  onNotesWidgetClick: () => void;
+  onMusicWidgetClick: () => void;
+  onRadioWidgetClick: () => void;
   onMouseDown: (e: React.MouseEvent, boxId: string) => void;
   onContextMenu: (e: React.MouseEvent, boxId: string) => void;
   onMouseEnter: (boxId: string) => void;
@@ -74,6 +78,8 @@ const Grid: React.FC<GridProps> = ({
   onClockWidgetClick,
   onPomodoroWidgetClick,
   onNotesWidgetClick,
+  onMusicWidgetClick,
+  onRadioWidgetClick,
   onMouseDown,
   onContextMenu,
   onMouseEnter,
@@ -126,6 +132,14 @@ const Grid: React.FC<GridProps> = ({
         return <Pomodoro size={widgetSize} />;
       case 'notes':
         return <Notes size={widgetSize} />;
+      case 'music':
+        return (
+          <MusicWidget size={widgetSize} onClick={() => onMusicWidgetClick()} />
+        );
+      case 'radio':
+        return (
+          <RadioWidget size={widgetSize} onClick={() => onRadioWidgetClick()} />
+        );
       default:
         return null;
     }
@@ -140,7 +154,11 @@ const Grid: React.FC<GridProps> = ({
       } else if (box.widget.type === 'pomodoro') {
         onPomodoroWidgetClick(box.id);
       } else if (box.widget.type === 'notes') {
-        onNotesWidgetClick(box.id);
+        onNotesWidgetClick();
+      } else if (box.widget.type === 'music') {
+        onMusicWidgetClick();
+      } else if (box.widget.type === 'radio') {
+        onRadioWidgetClick();
       }
     }
   };
