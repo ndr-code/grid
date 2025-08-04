@@ -244,7 +244,7 @@ function App() {
               setShowPomodoroDialog(true);
             }
           }}
-          onNotesWidgetClick={(_boxId: string) => {
+          onNotesWidgetClick={() => {
             if (!editMode) {
               setShowNotesDialog(true);
             }
