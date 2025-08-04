@@ -15,6 +15,7 @@ import { NotesDialog } from './components/NotesDialog';
 import { MusicDialog } from './components/MusicDialog';
 import { RadioDialog } from './components/RadioDialog';
 import { BottomDock } from './components/BottomDock';
+import { MotivationalQuotes } from './components/MotivationalQuotes';
 
 // Import custom hooks and utilities
 import { useEditMode } from './hooks';
@@ -164,6 +165,14 @@ function App() {
         editMode ? 'border-12 bg-gray-800 edit-mode-border' : 'bg-gray-900'
       }`}
     >
+      <div className='absolute px-4 pt-4'>
+        <div className='text-gray-300 text-sm font-medium mb-1'>Grid</div>
+        <MotivationalQuotes
+          speed={60}
+          pauseDuration={5000}
+          className='text-gray-500'
+        />
+      </div>
       {/* Main Content Area */}
       <div className='flex-1 flex items-center justify-center p-8 relative'>
         <ControlButtons
