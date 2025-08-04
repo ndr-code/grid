@@ -19,7 +19,7 @@ export const TypingAnimation = ({
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
 
     if (isTyping && currentIndex < text.length) {
       // Typing phase

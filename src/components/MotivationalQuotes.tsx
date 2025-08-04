@@ -115,7 +115,7 @@ export const MotivationalQuotes = ({
   const fullText = `"${currentQuote.text}"\n— ${currentQuote.author}`;
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
 
     if (isTyping && currentIndex < fullText.length) {
       // Typing phase
