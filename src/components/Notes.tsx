@@ -3,63 +3,100 @@ import { SquarePen } from 'lucide-react';
 
 interface NotesProps {
   size?:
-    | 'tiny'
-    | 'narrow'
-    | 'wide'
-    | 'small'
-    | 'medium-wide'
-    | 'medium-tall'
-    | 'large'
-    | 'xlarge';
+    | '1x1'
+    | '1x2'
+    | '1x3'
+    | '1x4'
+    | '1x5'
+    | '2x1'
+    | '2x2'
+    | '2x3'
+    | '2x4'
+    | '2x5'
+    | '3x1'
+    | '3x2'
+    | '3x3'
+    | '3x4'
+    | '3x5'
+    | '4x1'
+    | '4x2'
+    | '4x3'
+    | '4x4'
+    | '4x5'
+    | '5x1'
+    | '5x2'
+    | '5x3'
+    | '5x4'
+    | '5x5';
   className?: string;
-  width?: number;
-  height?: number;
 }
 
-export const Notes = ({
-  size = 'small',
-  className = '',
-  width = 2,
-  height = 2,
-}: NotesProps) => {
+export const Notes = ({ size = '2x2', className = '' }: NotesProps) => {
+  // Helper function to parse grid dimensions from size string
+  const parseGridSize = (gridSize: string) => {
+    const [w, h] = gridSize.split('x').map(Number);
+    return { width: w, height: h };
+  };
+
+  const { width: gridWidth, height: gridHeight } = parseGridSize(size);
+  const totalArea = gridWidth * gridHeight;
+
   const getIconSize = () => {
-    const totalArea = width * height;
-    const maxDimension = Math.max(width, height);
+    const maxDimension = Math.max(gridWidth, gridHeight);
 
-    if (size === 'tiny') return 14; // 1x1
-    if (size === 'narrow' || size === 'wide') return 18; // 1xN or Nx1
-    if (size === 'small') return 24; // 2x2
-    if (size === 'medium-wide' || size === 'medium-tall') return 32; // 2x3 or 3x2
-    if (size === 'large') return 48; // 3x3
+    // 1x1 - minimal display
+    if (gridWidth === 1 && gridHeight === 1) return 14;
 
-    // For xlarge, calculate dynamically
-    if (totalArea >= 49) return 80; // 7x7 and above
-    if (totalArea >= 36) return 72; // 6x6
-    if (totalArea >= 25) return 64; // 5x5
-    if (maxDimension >= 5) return 56; // 5xN or Nx5
+    // 1xN or Nx1 - compact display
+    if (gridWidth === 1 || gridHeight === 1) return 18;
 
-    return 48; // default
+    // 2x2 - standard size
+    if (gridWidth === 2 && gridHeight === 2) return 24;
+
+    // 2x3, 3x2 - medium size
+    if (totalArea >= 6 && totalArea <= 8 && maxDimension <= 3) return 32;
+
+    // 3x3, 3x4, 4x3 - large size
+    if (totalArea >= 9 && totalArea <= 12) return 48;
+
+    // 4x4+ - extra large
+    if (totalArea >= 16) {
+      if (totalArea >= 25) return 80; // 5x5+
+      if (totalArea >= 20) return 72; // 4x5, 5x4
+      return 64; // 4x4
+    }
+
+    return 32; // default
   };
 
   const getTextSize = () => {
-    const totalArea = width * height;
+    // 1x1 - no text
+    if (gridWidth === 1 && gridHeight === 1) return '';
 
-    if (size === 'tiny') return ''; // No text for tiny
-    if (size === 'narrow' || size === 'wide') return 'text-xs'; // 1xN or Nx1
-    if (size === 'small') return 'text-sm'; // 2x2
-    if (size === 'medium-wide' || size === 'medium-tall') return 'text-base'; // 2x3 or 3x2
-    if (size === 'large') return 'text-lg'; // 3x3
+    // 1xN or Nx1 - minimal text
+    if (gridWidth === 1 || gridHeight === 1) return 'text-xs';
 
-    // For xlarge
-    if (totalArea >= 49) return 'text-4xl'; // 7x7 and above
-    if (totalArea >= 36) return 'text-3xl'; // 6x6
-    if (totalArea >= 25) return 'text-2xl'; // 5x5
+    // 2x2 - small text
+    if (gridWidth === 2 && gridHeight === 2) return 'text-sm';
 
-    return 'text-xl'; // default
+    // 2x3, 3x2 - base text
+    if (totalArea >= 6 && totalArea <= 8) return 'text-base';
+
+    // 3x3, 3x4, 4x3 - large text
+    if (totalArea >= 9 && totalArea <= 12) return 'text-lg';
+
+    // 4x4+ - extra large text
+    if (totalArea >= 16) {
+      if (totalArea >= 25) return 'text-4xl'; // 5x5+
+      if (totalArea >= 20) return 'text-3xl'; // 4x5, 5x4
+      return 'text-2xl'; // 4x4
+    }
+
+    return 'text-base'; // default
   };
 
   const shouldShowText = () => {
-    return size !== 'tiny' && (width >= 2 || height >= 2);
+    return gridWidth !== 1 || gridHeight !== 1; // Show text for anything larger than 1x1
   };
 
   const getIcon = () => {

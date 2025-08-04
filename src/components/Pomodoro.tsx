@@ -4,23 +4,38 @@ import { Play, Pause, RotateCcw } from 'lucide-react';
 
 interface PomodoroProps {
   size?:
-    | 'tiny'
-    | 'narrow'
-    | 'wide'
-    | 'small'
-    | 'medium-wide'
-    | 'medium-tall'
-    | 'large'
-    | 'xlarge';
+    | '1x1'
+    | '1x2'
+    | '1x3'
+    | '1x4'
+    | '1x5'
+    | '2x1'
+    | '2x2'
+    | '2x3'
+    | '2x4'
+    | '2x5'
+    | '3x1'
+    | '3x2'
+    | '3x3'
+    | '3x4'
+    | '3x5'
+    | '4x1'
+    | '4x2'
+    | '4x3'
+    | '4x4'
+    | '4x5'
+    | '5x1'
+    | '5x2'
+    | '5x3'
+    | '5x4'
+    | '5x5';
   className?: string;
   workDuration?: number;
   breakDuration?: number;
-  width?: number;
-  height?: number;
 }
 
 export const Pomodoro = ({
-  size = 'small',
+  size = '2x2',
   className = '',
   workDuration = 25,
   breakDuration = 5,
@@ -28,6 +43,14 @@ export const Pomodoro = ({
   const [timeLeft, setTimeLeft] = useState(workDuration * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [session, setSession] = useState<'work' | 'break'>('work');
+
+  // Helper function to parse grid dimensions from size string
+  const parseGridSize = (gridSize: string) => {
+    const [w, h] = gridSize.split('x').map(Number);
+    return { width: w, height: h };
+  };
+
+  const { width: gridWidth, height: gridHeight } = parseGridSize(size);
 
   useEffect(() => {
     let interval: number;
@@ -73,83 +96,105 @@ export const Pomodoro = ({
   };
 
   const getSizeClasses = () => {
-    switch (size) {
-      case 'tiny':
-        return {
-          timeClass: 'text-xs font-mono font-bold',
-          sessionClass: 'text-xs',
-          buttonClass: 'w-4 h-4',
-          iconSize: 10,
-          gap: 'gap-1',
-        };
-      case 'narrow':
-        return {
-          timeClass: 'text-sm font-mono font-bold',
-          sessionClass: 'text-xs',
-          buttonClass: 'w-5 h-5',
-          iconSize: 12,
-          gap: 'gap-1',
-        };
-      case 'wide':
-        return {
-          timeClass: 'text-sm font-mono font-bold',
-          sessionClass: 'text-xs',
-          buttonClass: 'w-5 h-5',
-          iconSize: 12,
-          gap: 'gap-1',
-        };
-      case 'small':
-        return {
-          timeClass: 'text-lg font-mono font-bold',
-          sessionClass: 'text-xs',
-          buttonClass: 'w-6 h-6',
-          iconSize: 12,
-          gap: 'gap-1',
-        };
-      case 'medium-wide':
-        return {
-          timeClass: 'text-2xl font-mono font-bold',
-          sessionClass: 'text-sm',
-          buttonClass: 'w-8 h-8',
-          iconSize: 16,
-          gap: 'gap-2',
-        };
-      case 'medium-tall':
-        return {
-          timeClass: 'text-3xl font-mono font-bold',
-          sessionClass: 'text-sm',
-          buttonClass: 'w-8 h-8',
-          iconSize: 16,
-          gap: 'gap-2',
-        };
-      case 'large':
-        return {
-          timeClass: 'text-6xl font-mono font-bold',
-          sessionClass: 'text-xl',
-          buttonClass: 'w-12 h-12',
-          iconSize: 20,
-          gap: 'gap-4',
-        };
-      case 'xlarge':
-        return {
-          timeClass: 'text-8xl font-mono font-bold',
-          sessionClass: 'text-2xl',
-          buttonClass: 'w-16 h-16',
-          iconSize: 24,
-          gap: 'gap-6',
-        };
-      default:
-        return {
-          timeClass: 'text-2xl font-mono font-bold',
-          sessionClass: 'text-sm',
-          buttonClass: 'w-8 h-8',
-          iconSize: 16,
-          gap: 'gap-2',
-        };
+    const totalArea = gridWidth * gridHeight;
+    const maxDimension = Math.max(gridWidth, gridHeight);
+
+    // 1x1 - minimal display
+    if (gridWidth === 1 && gridHeight === 1) {
+      return {
+        timeClass: 'text-xs font-mono font-bold',
+        sessionClass: 'text-xs',
+        buttonClass: 'w-4 h-4',
+        iconSize: 10,
+        gap: 'gap-1',
+        layout: 'minimal',
+      };
     }
+
+    // 1xN (tall and narrow) or Nx1 (wide and short) - compact display
+    if (gridWidth === 1 || gridHeight === 1) {
+      return {
+        timeClass: 'text-sm font-mono font-bold',
+        sessionClass: 'text-xs',
+        buttonClass: 'w-5 h-5',
+        iconSize: 12,
+        gap: 'gap-1',
+        layout: 'compact',
+      };
+    }
+
+    // 2x2 - standard size
+    if (gridWidth === 2 && gridHeight === 2) {
+      return {
+        timeClass: 'text-lg font-mono font-bold',
+        sessionClass: 'text-xs',
+        buttonClass: 'w-6 h-6',
+        iconSize: 12,
+        gap: 'gap-1',
+        layout: 'standard',
+      };
+    }
+
+    // 2x3, 3x2 - medium size
+    if (totalArea >= 6 && totalArea <= 8 && maxDimension <= 3) {
+      return {
+        timeClass: 'text-2xl font-mono font-bold',
+        sessionClass: 'text-sm',
+        buttonClass: 'w-8 h-8',
+        iconSize: 16,
+        gap: 'gap-2',
+        layout: 'medium',
+      };
+    }
+
+    // 3x3, 3x4, 4x3 - large size
+    if (totalArea >= 9 && totalArea <= 12) {
+      return {
+        timeClass: 'text-4xl font-mono font-bold',
+        sessionClass: 'text-lg',
+        buttonClass: 'w-10 h-10',
+        iconSize: 18,
+        gap: 'gap-3',
+        layout: 'large',
+      };
+    }
+
+    // 4x4, 4x5, 5x4, 5x5 - extra large
+    if (totalArea >= 16) {
+      let timeSize = 'text-6xl';
+      let sessionSize = 'text-xl';
+      let buttonSize = 'w-12 h-12';
+      let iconSize = 20;
+
+      if (totalArea >= 25) {
+        timeSize = 'text-8xl';
+        sessionSize = 'text-2xl';
+        buttonSize = 'w-16 h-16';
+        iconSize = 24;
+      }
+
+      return {
+        timeClass: `${timeSize} font-mono font-bold`,
+        sessionClass: sessionSize,
+        buttonClass: buttonSize,
+        iconSize: iconSize,
+        gap: 'gap-4',
+        layout: 'xlarge',
+      };
+    }
+
+    // Default for other sizes
+    return {
+      timeClass: 'text-2xl font-mono font-bold',
+      sessionClass: 'text-sm',
+      buttonClass: 'w-8 h-8',
+      iconSize: 16,
+      gap: 'gap-2',
+      layout: 'standard',
+    };
   };
 
-  const { timeClass, sessionClass, buttonClass, iconSize, gap } =
+  const { timeClass, sessionClass, buttonClass, iconSize, gap, layout } =
     getSizeClasses();
 
   return (
@@ -169,7 +214,7 @@ export const Pomodoro = ({
         {formatTime(timeLeft)}
       </motion.div>
 
-      {size !== 'small' && (
+      {layout !== 'minimal' && (
         <div className={`flex justify-center ${gap}`}>
           <button
             onClick={toggleTimer}

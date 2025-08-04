@@ -69,7 +69,7 @@ export const ClockDialog = ({
                   Digital Clock
                 </Dialog.Title>
 
-                <Clock size='large' showDate={true} className='mb-6' />
+                <Clock size='3x3' showDate={true} className='mb-6' />
 
                 {mode === 'assign' ? (
                   <motion.button

@@ -74,7 +74,7 @@ export const PomodoroDialog = ({
                 </Dialog.Title>
 
                 <Pomodoro
-                  size='large'
+                  size='3x3'
                   className='mb-6'
                   workDuration={workDuration}
                   breakDuration={breakDuration}

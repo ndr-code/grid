@@ -87,47 +87,45 @@ const Grid: React.FC<GridProps> = ({
     if (!box.widget) return null;
 
     // Determine size based on box dimensions
-    const getWidgetSize = (
-      box: GridBox
-    ):
-      | 'tiny'
-      | 'narrow'
-      | 'wide'
-      | 'small'
-      | 'medium-wide'
-      | 'medium-tall'
-      | 'large'
-      | 'xlarge' => {
+    const getWidgetSize = (box: GridBox) => {
       const { width, height } = box;
-
-      // Map specific dimensions to widget sizes
-      if (width === 1 && height === 1) return 'tiny'; // 1x1
-      if (width === 1 && height > 1) return 'narrow'; // 1xN (any height)
-      if (height === 1 && width > 1) return 'wide'; // Nx1 (any width)
-      if (width === 2 && height === 2) return 'small'; // 2x2
-      if (width === 2 && height === 3) return 'medium-wide'; // 2x3
-      if (width === 3 && height === 2) return 'medium-tall'; // 3x2
-      if (width === 3 && height === 3) return 'large'; // 3x3
-
-      // For anything larger than 3x3
-      return 'xlarge'; // >3x3
+      return `${width}x${height}` as
+        | '1x1'
+        | '1x2'
+        | '1x3'
+        | '1x4'
+        | '1x5'
+        | '2x1'
+        | '2x2'
+        | '2x3'
+        | '2x4'
+        | '2x5'
+        | '3x1'
+        | '3x2'
+        | '3x3'
+        | '3x4'
+        | '3x5'
+        | '4x1'
+        | '4x2'
+        | '4x3'
+        | '4x4'
+        | '4x5'
+        | '5x1'
+        | '5x2'
+        | '5x3'
+        | '5x4'
+        | '5x5';
     };
 
     const widgetSize = getWidgetSize(box);
 
     switch (box.widget.type) {
       case 'clock':
-        return (
-          <Clock size={widgetSize} width={box.width} height={box.height} />
-        );
+        return <Clock size={widgetSize} />;
       case 'pomodoro':
-        return (
-          <Pomodoro size={widgetSize} width={box.width} height={box.height} />
-        );
+        return <Pomodoro size={widgetSize} />;
       case 'notes':
-        return (
-          <Notes size={widgetSize} width={box.width} height={box.height} />
-        );
+        return <Notes size={widgetSize} />;
       default:
         return null;
     }

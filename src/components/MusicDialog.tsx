@@ -78,6 +78,13 @@ const ambienceTracks: AmbienceTrack[] = [
     youtubeId: 'TpO_8tk6yNQ',
     category: 'Piano',
   },
+  {
+    id: '7',
+    title: 'Hollow Knight OST',
+    description: 'Listen to the Hollow Knight OST',
+    youtubeId: 'ExN66QlCf7Y',
+    category: 'Soundtrack',
+  },
 ];
 
 // Mini Player Component - moved outside to prevent re-animation
