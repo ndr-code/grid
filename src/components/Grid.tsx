@@ -41,6 +41,7 @@ interface GridProps {
   onRadioWidgetClick: () => void;
   onMouseDown: (e: React.MouseEvent, boxId: string) => void;
   onContextMenu: (e: React.MouseEvent, boxId: string) => void;
+  onShowContextMenu?: (e: React.MouseEvent, boxId: string) => void;
   onMouseEnter: (boxId: string) => void;
   onMouseLeave: (boxId: string) => void;
   onMouseUp: (e: React.MouseEvent) => void;
@@ -82,6 +83,7 @@ const Grid: React.FC<GridProps> = ({
   onRadioWidgetClick,
   onMouseDown,
   onContextMenu,
+  onShowContextMenu,
   onMouseEnter,
   onMouseLeave,
   onMouseUp,
@@ -145,7 +147,7 @@ const Grid: React.FC<GridProps> = ({
     }
   };
 
-  const handleBoxClick = (box: GridBox) => {
+  const handleBoxClick = (e: React.MouseEvent, box: GridBox) => {
     if (assignmentMode.active) {
       onAssignWidget(box.id);
     } else if (box.widget) {
@@ -160,6 +162,10 @@ const Grid: React.FC<GridProps> = ({
       } else if (box.widget.type === 'radio') {
         onRadioWidgetClick();
       }
+    } else if (!editMode && !box.widget && onShowContextMenu) {
+      // Show context menu for empty boxes in non-edit mode
+      e.stopPropagation();
+      onShowContextMenu(e, box.id);
     }
   };
 
@@ -304,7 +310,7 @@ const Grid: React.FC<GridProps> = ({
                 top: position.top,
                 zIndex: 5,
               }}
-              onClick={() => handleBoxClick(box)}
+              onClick={(e) => handleBoxClick(e, box)}
               onMouseDown={(e) => onMouseDown(e, box.id)}
               onContextMenu={(e) => onContextMenu(e, box.id)}
               onMouseEnter={() => onMouseEnter(box.id)}

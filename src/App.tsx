@@ -7,6 +7,7 @@ import { BOX_SIZE, GAP } from './constants';
 import { ControlButtons } from './components/ControlButtons';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import { ContextMenu } from './components/ContextMenu';
+import { WidgetSelectionDialog } from './components/WidgetSelectionDialog';
 import { ColorPicker } from './components/ColorPicker';
 import Grid from './components/Grid';
 import { ClockDialog } from './components/ClockDialog';
@@ -73,6 +74,7 @@ function App() {
     cancelAssignmentMode,
     assignWidgetToBox,
     deleteWidget,
+    directAssignWidget,
     startWidgetDrag,
     endWidgetDrag,
     handleWidgetDragEnterGrid,
@@ -98,6 +100,11 @@ function App() {
   const [showMusicDialog, setShowMusicDialog] = useState(false);
   const [showRadioDialog, setShowRadioDialog] = useState(false);
   const [isMusicMinimized, setIsMusicMinimized] = useState(false);
+  const [showWidgetSelectionDialog, setShowWidgetSelectionDialog] =
+    useState(false);
+  const [selectedBoxIdForWidget, setSelectedBoxIdForWidget] = useState<
+    string | null
+  >(null);
 
   // Mouse tracking for click vs drag detection
   const [mouseDownPos, setMouseDownPos] = useState<{
@@ -159,6 +166,44 @@ function App() {
     redo,
   ]);
 
+  // Close context menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (contextMenu.visible) {
+        const target = event.target as HTMLElement;
+        // Don't close if clicking on the context menu itself
+        if (!target.closest('[data-context-menu]')) {
+          setContextMenu({ visible: false, x: 0, y: 0, boxId: '' });
+        }
+      }
+    };
+
+    if (contextMenu.visible) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [contextMenu.visible, setContextMenu]);
+
+  // Handle opening widget selection dialog
+  const handleOpenWidgetSelection = (boxId: string) => {
+    setSelectedBoxIdForWidget(boxId);
+    setShowWidgetSelectionDialog(true);
+    // Close context menu
+    setContextMenu({ visible: false, x: 0, y: 0, boxId: '' });
+  };
+
+  // Handle widget selection from dialog
+  const handleSelectWidget = (
+    widgetType: 'clock' | 'pomodoro' | 'notes' | 'music' | 'radio'
+  ) => {
+    if (selectedBoxIdForWidget) {
+      // Directly assign widget to the selected box without using assignment mode
+      directAssignWidget(selectedBoxIdForWidget, widgetType);
+    }
+    setShowWidgetSelectionDialog(false);
+    setSelectedBoxIdForWidget(null);
+  };
+
   return (
     <div
       className={`min-h-screen flex flex-col relative transition-all duration-300 ${
@@ -177,12 +222,14 @@ function App() {
       <div className='flex-1 flex items-center justify-center p-8 relative'>
         <ControlButtons
           editMode={editMode}
+          assignmentMode={assignmentMode}
           onToggleEdit={toggleEditMode}
           onUndo={undo}
           onRedo={redo}
           onReset={resetGrid}
           onExplode={explodeGrid}
           onSpawn={spawnGrid}
+          onCancelAssignment={cancelAssignmentMode}
           canUndo={historyIndex > 0}
           canRedo={historyIndex < history.length - 1}
         />
@@ -278,15 +325,22 @@ function App() {
             }
           }}
           onContextMenu={(e, boxId) => {
-            if (editMode) {
-              e.preventDefault();
-              setContextMenu({
-                visible: true,
-                x: e.clientX,
-                y: e.clientY,
-                boxId: boxId,
-              });
-            }
+            e.preventDefault();
+            setContextMenu({
+              visible: true,
+              x: e.clientX,
+              y: e.clientY,
+              boxId: boxId,
+            });
+          }}
+          onShowContextMenu={(e, boxId) => {
+            e.preventDefault();
+            setContextMenu({
+              visible: true,
+              x: e.clientX,
+              y: e.clientY,
+              boxId: boxId,
+            });
           }}
           onMouseEnter={(boxId) => {
             if (dragStartBox && dragStartBox !== boxId && editMode) {
@@ -353,11 +407,14 @@ function App() {
           x={contextMenu.x}
           y={contextMenu.y}
           box={boxes.find((box) => box.id === contextMenu.boxId)}
+          editMode={editMode}
           onDelete={() => deleteBox(contextMenu.boxId)}
           onUnmerge={() => unmergeBox(contextMenu.boxId)}
           onColorHover={handleColorHover}
           onColorLeave={handleColorLeave}
           onDeleteWidget={() => deleteWidget(contextMenu.boxId)}
+          onAssignWidget={() => handleOpenWidgetSelection(contextMenu.boxId)}
+          onChangeWidget={() => handleOpenWidgetSelection(contextMenu.boxId)}
         />
 
         <ColorPicker
@@ -405,6 +462,11 @@ function App() {
           isMinimized={isMusicMinimized}
           onMinimize={setIsMusicMinimized}
           editMode={editMode}
+        />
+        <WidgetSelectionDialog
+          open={showWidgetSelectionDialog}
+          onOpenChange={setShowWidgetSelectionDialog}
+          onSelectWidget={handleSelectWidget}
         />
       </div>
 

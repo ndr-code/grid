@@ -982,6 +982,23 @@ export const useEditMode = () => {
     [boxes, saveToHistory]
   );
 
+  const directAssignWidget = useCallback(
+    (
+      boxId: string,
+      widgetType: 'clock' | 'pomodoro' | 'notes' | 'music' | 'radio'
+    ) => {
+      const newBoxes = boxes.map((box) =>
+        box.id === boxId
+          ? { ...box, widget: { type: widgetType, data: {} } }
+          : box
+      );
+
+      setBoxes(newBoxes);
+      saveToHistory(newBoxes);
+    },
+    [boxes, saveToHistory]
+  );
+
   // Widget drag handlers
   const startWidgetDrag = useCallback((widgetType: string) => {
     setIsDraggingWidget(true);
@@ -1087,6 +1104,7 @@ export const useEditMode = () => {
     cancelAssignmentMode,
     assignWidgetToBox,
     deleteWidget,
+    directAssignWidget,
 
     // Widget drag handlers
     startWidgetDrag,

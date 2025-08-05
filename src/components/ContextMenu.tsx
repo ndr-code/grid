@@ -5,11 +5,14 @@ interface ContextMenuProps {
   x: number;
   y: number;
   box: GridBox | undefined;
+  editMode?: boolean;
   onDelete: () => void;
   onUnmerge: () => void;
   onColorHover: () => void;
   onColorLeave: (e: React.MouseEvent) => void;
   onDeleteWidget?: () => void;
+  onAssignWidget?: () => void;
+  onChangeWidget?: () => void;
 }
 
 export const ContextMenu = ({
@@ -17,11 +20,14 @@ export const ContextMenu = ({
   x,
   y,
   box,
+  editMode,
   onDelete,
   onUnmerge,
   onColorHover,
   onColorLeave,
   onDeleteWidget,
+  onAssignWidget,
+  onChangeWidget,
 }: ContextMenuProps) => {
   if (!visible || !box) return null;
 
@@ -34,25 +40,32 @@ export const ContextMenu = ({
       style={{ left: x, top: y }}
       onClick={(e) => e.stopPropagation()}
     >
-      <button
-        className='w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 transition-colors duration-150 flex items-center gap-2 cursor-pointer border-0 bg-transparent'
-        onClick={onDelete}
-      >
-        <svg
-          className='w-4 h-4'
-          fill='none'
-          stroke='currentColor'
-          viewBox='0 0 24 24'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'
-          />
-        </svg>
-        Delete
-      </button>
+      {/* Edit Mode: Full menu options */}
+      {editMode && (
+        <>
+          <button
+            className='w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 transition-colors duration-150 flex items-center gap-2 cursor-pointer border-0 bg-transparent'
+            onClick={onDelete}
+          >
+            <svg
+              className='w-4 h-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'
+              />
+            </svg>
+            Delete
+          </button>
+        </>
+      )}
+
+      {/* Change Color: Always available */}
       <button
         className='w-full px-4 py-2 text-left text-green-600 hover:bg-green-50 transition-colors duration-150 flex items-center gap-2 relative cursor-pointer border-0 bg-transparent'
         onMouseEnter={onColorHover}
@@ -79,6 +92,52 @@ export const ContextMenu = ({
         </svg>
         Change Color
       </button>
+
+      {/* Widget Assignment/Change: Available in both Edit Mode and Non-Edit Mode */}
+      {!box.widget && onAssignWidget && (
+        <button
+          className='w-full px-4 py-2 text-left text-purple-600 hover:bg-purple-50 transition-colors duration-150 flex items-center gap-2 cursor-pointer border-0 bg-transparent'
+          onClick={onAssignWidget}
+        >
+          <svg
+            className='w-4 h-4'
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M12 6v6m0 0v6m0-6h6m-6 0H6'
+            />
+          </svg>
+          Assign Widget
+        </button>
+      )}
+      {box.widget && onChangeWidget && (
+        <button
+          className='w-full px-4 py-2 text-left text-indigo-600 hover:bg-indigo-50 transition-colors duration-150 flex items-center gap-2 cursor-pointer border-0 bg-transparent'
+          onClick={onChangeWidget}
+        >
+          <svg
+            className='w-4 h-4'
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4'
+            />
+          </svg>
+          Change Widget
+        </button>
+      )}
+
+      {/* Remove Widget: Always available for boxes with widgets */}
       {box.widget && onDeleteWidget && (
         <button
           className='w-full px-4 py-2 text-left text-orange-600 hover:bg-orange-50 transition-colors duration-150 flex items-center gap-2 cursor-pointer border-0 bg-transparent'
@@ -97,10 +156,11 @@ export const ContextMenu = ({
               d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'
             />
           </svg>
-          Delete Widget
+          Remove Widget
         </button>
       )}
-      {!isSmallBox && (
+
+      {editMode && !isSmallBox && (
         <button
           className='w-full px-4 py-2 text-left text-blue-600 hover:bg-blue-50 transition-colors duration-150 flex items-center gap-2 cursor-pointer border-0 bg-transparent'
           onClick={onUnmerge}

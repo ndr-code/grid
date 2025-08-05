@@ -1,25 +1,32 @@
-import { Undo2, Redo2, RotateCcw, Edit3, Loader, Grid } from 'lucide-react';
+import { Undo2, Redo2, RotateCcw, Edit3, Loader, Grid, X } from 'lucide-react';
 
 interface ControlButtonsProps {
   editMode: boolean;
+  assignmentMode?: {
+    active: boolean;
+    widgetType: string | null;
+  };
   onToggleEdit: () => void;
   onUndo: () => void;
   onRedo: () => void;
   onReset: () => void;
   onExplode: () => void;
   onSpawn: () => void;
+  onCancelAssignment?: () => void;
   canUndo: boolean;
   canRedo: boolean;
 }
 
 export const ControlButtons = ({
   editMode,
+  assignmentMode,
   onToggleEdit,
   onUndo,
   onRedo,
   onReset,
   onExplode,
   onSpawn,
+  onCancelAssignment,
   canUndo,
   canRedo,
 }: ControlButtonsProps) => (
@@ -77,6 +84,16 @@ export const ControlButtons = ({
         className='w-12 h-12 cursor-pointer bg-gray-500 hover:bg-red-800 text-white rounded-lg shadow-lg transition-colors duration-200 font-medium flex items-center justify-center border-0'
       >
         <RotateCcw size={20} />
+      </button>
+    )}
+    {/* Exit Assignment Mode Button */}
+    {assignmentMode?.active && (
+      <button
+        onClick={onCancelAssignment}
+        title='Exit Assignment Mode'
+        className='w-12 h-12 cursor-pointer bg-red-700 hover:bg-red-800 text-white rounded-lg shadow-lg transition-colors duration-200 font-medium flex items-center justify-center border-0'
+      >
+        <X size={20} />
       </button>
     )}
     <button

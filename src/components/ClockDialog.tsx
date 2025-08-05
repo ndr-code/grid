@@ -1,6 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SquarePlus, SquareX } from 'lucide-react';
 import { Clock } from './Clock';
 
 interface ClockDialogProps {
@@ -68,35 +69,34 @@ export const ClockDialog = ({
                 <Dialog.Title className='text-2xl font-bold text-gray-600 mb-6 text-center'>
                   Digital Clock
                 </Dialog.Title>
-
                 <Clock size='3x3' showDate={true} className='mb-6' />
-
                 {mode === 'assign' ? (
                   <motion.button
-                    className='bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors duration-200 cursor-pointer'
+                    className='bg-blue-500 hover:bg-blue-600 text-white px-3 py-3 rounded-lg text-sm font-medium transition-colors duration-200 cursor-pointer'
                     onClick={handleAssignToGrid}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3, duration: 0.2 }}
+                    title='Assign to Grid'
                   >
-                    Assign to Grid
+                    <SquarePlus className='w-4 h-4' />
                   </motion.button>
                 ) : (
                   <motion.button
-                    className='bg-red-500 hover:bg-red-600 text-white px-6 py-3 text-sm rounded-lg font-medium transition-colors duration-200 cursor-pointer'
+                    className='bg-red-500 hover:bg-red-600 text-white px-3 py-3 text-sm rounded-lg font-medium transition-colors duration-200 cursor-pointer flex items-center gap-2'
                     onClick={handleRemoveWidget}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3, duration: 0.2 }}
+                    title='Remove Widget'
                   >
-                    Remove Widget
+                    <SquareX className='w-4 h-4' />
                   </motion.button>
-                )}
-
+                )}{' '}
                 <Dialog.Close asChild>
                   <motion.button
                     className='cursor-pointer absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-600 transition-colors'
