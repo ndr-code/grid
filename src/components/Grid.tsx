@@ -1,11 +1,11 @@
 import React from 'react';
 import type { GridBox, Position } from '../types';
 import { BOX_SIZE, GAP } from '../constants';
-import { Clock } from './Clock';
-import { Pomodoro } from './Pomodoro';
-import { Notes } from './Notes';
-import MusicWidget from './MusicWidget';
-import RadioWidget from './RadioWidget';
+import { Clock } from './widgets/Clock';
+import { Pomodoro } from './widgets/Pomodoro';
+import { Notes } from './widgets/Notes';
+import MusicWidget from './widgets/MusicWidget';
+import RadioWidget from './widgets/RadioWidget';
 
 interface GridProps {
   boxes: GridBox[];

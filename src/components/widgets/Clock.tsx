@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useGlobalTime } from '../hooks';
+import { useGlobalTime } from '../../hooks';
 
 interface ClockProps {
   size?:

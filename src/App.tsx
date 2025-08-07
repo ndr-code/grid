@@ -10,12 +10,12 @@ import { ContextMenu } from './components/ui/ContextMenu';
 import { WidgetSelectionDialog } from './components/WidgetSelectionDialog';
 import { ColorPicker } from './components/ui/ColorPicker';
 import Grid from './components/Grid';
-import { ClockDialog } from './components/ClockDialog';
-import { PomodoroDialog } from './components/PomodoroDialog';
-import { NotesDialog } from './components/NotesDialog';
-import { MusicDialog } from './components/MusicDialog';
-import { RadioDialog } from './components/RadioDialog';
-import { BottomDock } from './components/BottomDock';
+import { ClockDialog } from './components/widgets/ClockDialog';
+import { PomodoroDialog } from './components/widgets/PomodoroDialog';
+import { NotesDialog } from './components/widgets/NotesDialog';
+import { MusicDialog } from './components/widgets/MusicDialog';
+import { RadioDialog } from './components/widgets/RadioDialog';
+import { BottomDock } from './components/navigation/BottomDock';
 import { MotivationalQuotes } from './components/MotivationalQuotes';
 
 // Import custom hooks and utilities
