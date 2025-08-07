@@ -2,7 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SquarePlus, SquareX } from 'lucide-react';
-import { Clock } from '../widgets/Clock';
+import { Clock } from './ClockWidget';
 
 interface ClockDialogProps {
   open: boolean;

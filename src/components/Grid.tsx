@@ -1,9 +1,9 @@
 import React from 'react';
 import type { GridBox, Position } from '../types';
 import { BOX_SIZE, GAP } from '../constants';
-import { Clock } from './widgets/Clock';
+import { Clock } from './widgets/ClockWidget';
 import { Pomodoro } from './widgets/Pomodoro';
-import { Notes } from './widgets/Notes';
+import { Notes } from './widgets/NotesWidget';
 import MusicWidget from './widgets/MusicWidget';
 import RadioWidget from './widgets/RadioWidget';
 

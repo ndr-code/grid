@@ -7,10 +7,38 @@ const MAX_BOX_SIZE = 5;
 
 // Utility functions
 const getDefaultBoxes = (): GridBox[] => [
-  { id: '0', x: 0, y: 0, width: 2, height: 1 },
-  { id: '1', x: 2, y: 0, width: 1, height: 2 },
-  { id: '2', x: 0, y: 1, width: 2, height: 2 },
-  { id: '3', x: 2, y: 2, width: 1, height: 1 },
+  {
+    id: '0',
+    x: 0,
+    y: 0,
+    width: 2,
+    height: 1,
+    widget: { type: 'notes', data: {} },
+  },
+  {
+    id: '1',
+    x: 2,
+    y: 0,
+    width: 1,
+    height: 2,
+    widget: { type: 'music', data: {} },
+  },
+  {
+    id: '2',
+    x: 0,
+    y: 1,
+    width: 2,
+    height: 2,
+    widget: { type: 'clock', data: {} },
+  },
+  {
+    id: '3',
+    x: 2,
+    y: 2,
+    width: 1,
+    height: 1,
+    widget: { type: 'radio', data: {} },
+  },
 ];
 
 const loadBoxes = (): GridBox[] => {
