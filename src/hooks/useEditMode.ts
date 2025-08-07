@@ -81,7 +81,7 @@ export const useEditMode = () => {
   });
   const [assignmentMode, setAssignmentMode] = useState<{
     active: boolean;
-    widgetType: 'clock' | 'pomodoro' | 'notes' | 'music' | 'radio' | null;
+    widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio' | null;
   }>({
     active: false,
     widgetType: null,
@@ -971,7 +971,7 @@ export const useEditMode = () => {
 
   // Assignment mode functions
   const startAssignmentMode = useCallback(
-    (widgetType: 'clock' | 'pomodoro' | 'notes' | 'music' | 'radio') => {
+    (widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio') => {
       setAssignmentMode({ active: true, widgetType });
     },
     []
@@ -1013,7 +1013,7 @@ export const useEditMode = () => {
   const directAssignWidget = useCallback(
     (
       boxId: string,
-      widgetType: 'clock' | 'pomodoro' | 'notes' | 'music' | 'radio'
+      widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio'
     ) => {
       const newBoxes = boxes.map((box) =>
         box.id === boxId
@@ -1047,7 +1047,7 @@ export const useEditMode = () => {
       // Auto-activate assignment mode when widget is dragged over grid
       if (
         draggedWidgetType === 'clock' ||
-        draggedWidgetType === 'pomodoro' ||
+        draggedWidgetType === 'timer' ||
         draggedWidgetType === 'notes' ||
         draggedWidgetType === 'music' ||
         draggedWidgetType === 'radio'

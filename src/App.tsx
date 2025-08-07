@@ -11,7 +11,7 @@ import { WidgetSelectionDialog } from './components/WidgetSelectionDialog';
 import { ColorPicker } from './components/ui/ColorPicker';
 import Grid from './components/Grid';
 import { ClockDialog } from './components/widgets/ClockDialog';
-import { PomodoroDialog } from './components/widgets/PomodoroDialog';
+import { TimerDialog } from './components/widgets/TimerDialog';
 import { NotesDialog } from './components/widgets/NotesDialog';
 import { MusicDialog } from './components/widgets/MusicDialog';
 import { RadioDialog } from './components/widgets/RadioDialog';
@@ -45,6 +45,7 @@ function App() {
     mergePreview,
     explodingBoxId,
     invalidMergeTarget,
+    isDraggingWidget,
     toggleEditMode,
     undo,
     redo,
@@ -89,13 +90,13 @@ function App() {
   const [selectedClockBoxId, setSelectedClockBoxId] = useState<string | null>(
     null
   );
-  const [showPomodoroDialog, setShowPomodoroDialog] = useState(false);
-  const [pomodoroDialogMode, setPomodoroDialogMode] = useState<
-    'assign' | 'view'
-  >('assign');
-  const [selectedPomodoroBoxId, setSelectedPomodoroBoxId] = useState<
-    string | null
-  >(null);
+  const [showTimerDialog, setShowTimerDialog] = useState(false);
+  const [timerDialogMode, setTimerDialogMode] = useState<'assign' | 'view'>(
+    'assign'
+  );
+  const [selectedTimerBoxId, setSelectedTimerBoxId] = useState<string | null>(
+    null
+  );
   const [showNotesDialog, setShowNotesDialog] = useState(false);
   const [showMusicDialog, setShowMusicDialog] = useState(false);
   const [showRadioDialog, setShowRadioDialog] = useState(false);
@@ -121,7 +122,7 @@ function App() {
   const handleAssignWidgetByDrag = (boxId: string, widgetType: string) => {
     if (
       widgetType === 'clock' ||
-      widgetType === 'pomodoro' ||
+      widgetType === 'timer' ||
       widgetType === 'notes' ||
       widgetType === 'music' ||
       widgetType === 'radio'
@@ -194,7 +195,7 @@ function App() {
 
   // Handle widget selection from dialog
   const handleSelectWidget = (
-    widgetType: 'clock' | 'pomodoro' | 'notes' | 'music' | 'radio'
+    widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio'
   ) => {
     if (selectedBoxIdForWidget) {
       // Directly assign widget to the selected box without using assignment mode
@@ -271,6 +272,7 @@ function App() {
           boxes={boxes}
           editMode={editMode}
           isDragging={isDragging}
+          isDraggingWidget={isDraggingWidget}
           dragStartBox={dragStartBox}
           dragOverBox={dragOverBox}
           bounds={bounds}
@@ -293,11 +295,11 @@ function App() {
               setShowClockDialog(true);
             }
           }}
-          onPomodoroWidgetClick={(boxId: string) => {
+          onTimerWidgetClick={(boxId: string) => {
             if (!editMode) {
-              setSelectedPomodoroBoxId(boxId);
-              setPomodoroDialogMode('view');
-              setShowPomodoroDialog(true);
+              setSelectedTimerBoxId(boxId);
+              setTimerDialogMode('view');
+              setShowTimerDialog(true);
             }
           }}
           onNotesWidgetClick={() => {
@@ -442,17 +444,17 @@ function App() {
           }}
           mode={clockDialogMode}
         />
-        <PomodoroDialog
-          open={showPomodoroDialog}
-          onOpenChange={setShowPomodoroDialog}
-          onAssignToGrid={() => startAssignmentMode('pomodoro')}
+        <TimerDialog
+          open={showTimerDialog}
+          onOpenChange={setShowTimerDialog}
+          onAssignToGrid={() => startAssignmentMode('timer')}
           onRemoveWidget={() => {
-            if (selectedPomodoroBoxId) {
-              deleteWidget(selectedPomodoroBoxId);
-              setSelectedPomodoroBoxId(null);
+            if (selectedTimerBoxId) {
+              deleteWidget(selectedTimerBoxId);
+              setSelectedTimerBoxId(null);
             }
           }}
-          mode={pomodoroDialogMode}
+          mode={timerDialogMode}
         />
         <NotesDialog open={showNotesDialog} onOpenChange={setShowNotesDialog} />
         <RadioDialog open={showRadioDialog} onOpenChange={setShowRadioDialog} />
@@ -484,9 +486,9 @@ function App() {
         }}
         onTimerClick={() => {
           if (!editMode) {
-            setPomodoroDialogMode('assign');
-            setSelectedPomodoroBoxId(null);
-            setShowPomodoroDialog(true);
+            setTimerDialogMode('assign');
+            setSelectedTimerBoxId(null);
+            setShowTimerDialog(true);
           }
         }}
         onNotesClick={() => {

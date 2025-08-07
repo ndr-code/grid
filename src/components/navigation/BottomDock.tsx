@@ -63,10 +63,10 @@ export const BottomDock = ({
           </div>
         </Tooltip>
 
-        <Tooltip content={editMode ? 'Disabled in Edit Mode' : 'Pomodoro'}>
+        <Tooltip content={editMode ? 'Disabled in Edit Mode' : 'Timer'}>
           <div
             draggable={!editMode}
-            onDragStart={(e) => handleDragStart(e, 'pomodoro')}
+            onDragStart={(e) => handleDragStart(e, 'timer')}
             onDragEnd={handleDragEnd}
             className='inline-block'
           >

@@ -33,10 +33,7 @@ export interface MusicWidgetProps {
   onClick?: () => void;
 }
 
-const MusicWidget: React.FC<MusicWidgetProps> = ({
-  size = '2x2',
-    onClick,
-}) => {
+const MusicWidget: React.FC<MusicWidgetProps> = ({ size = '2x2', onClick }) => {
   // Helper function to parse grid dimensions from size string
   const parseGridSize = (gridSize: string) => {
     const [w, h] = gridSize.split('x').map(Number);
@@ -50,13 +47,13 @@ const MusicWidget: React.FC<MusicWidgetProps> = ({
     const maxDimension = Math.max(gridWidth, gridHeight);
 
     // 1x1 - minimal display
-    if (gridWidth === 1 && gridHeight === 1) return 14;
+    if (gridWidth === 1 && gridHeight === 1) return 24;
 
     // 1xN or Nx1 - compact display
-    if (gridWidth === 1 || gridHeight === 1) return 18;
+    if (gridWidth === 1 || gridHeight === 1) return 24;
 
     // 2x2 - standard size
-    if (gridWidth === 2 && gridHeight === 2) return 24;
+    if (gridWidth === 2 && gridHeight === 2) return 32;
 
     // 2x3, 3x2 - medium size
     if (totalArea >= 6 && totalArea <= 8 && maxDimension <= 3) return 32;
@@ -82,7 +79,7 @@ const MusicWidget: React.FC<MusicWidgetProps> = ({
     if (gridWidth === 1 || gridHeight === 1) return 'text-xs';
 
     // 2x2 - small text
-    if (gridWidth === 2 && gridHeight === 2) return 'text-sm';
+    if (gridWidth === 2 && gridHeight === 2) return 'text-base';
 
     // 2x3, 3x2 - base text
     if (totalArea >= 6 && totalArea <= 8) return 'text-base';
@@ -101,7 +98,11 @@ const MusicWidget: React.FC<MusicWidgetProps> = ({
   };
 
   const shouldShowText = () => {
-    return gridWidth !== 1 || gridHeight !== 1; // Show text for anything larger than 1x1
+    // Don't show text for 1x1, 1x2, or 2x1
+    if (gridWidth === 1 && gridHeight === 1) return false; // 1x1
+    if (gridWidth === 1 && gridHeight === 2) return false; // 1x2
+    if (gridWidth === 2 && gridHeight === 1) return false; // 2x1
+    return true; // Show text for all other sizes
   };
 
   const getIcon = () => {

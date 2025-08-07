@@ -7,7 +7,7 @@ interface WidgetSelectionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelectWidget: (
-    widgetType: 'clock' | 'pomodoro' | 'notes' | 'music' | 'radio'
+    widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio'
   ) => void;
 }
 
@@ -17,7 +17,7 @@ export const WidgetSelectionDialog = ({
   onSelectWidget,
 }: WidgetSelectionDialogProps) => {
   const handleSelectWidget = (
-    widgetType: 'clock' | 'pomodoro' | 'notes' | 'music' | 'radio'
+    widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio'
   ) => {
     onSelectWidget(widgetType);
     onOpenChange(false);
@@ -32,11 +32,11 @@ export const WidgetSelectionDialog = ({
       description: 'Digital clock widget',
     },
     {
-      type: 'pomodoro' as const,
-      name: 'Pomodoro',
+      type: 'timer' as const,
+      name: 'Timer',
       icon: Timer,
       color: 'bg-green-500 hover:bg-green-600',
-      description: 'Pomodoro timer widget',
+      description: 'Timer timer widget',
     },
     {
       type: 'notes' as const,

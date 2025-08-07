@@ -2,7 +2,7 @@ import React from 'react';
 import type { GridBox, Position } from '../types';
 import { BOX_SIZE, GAP } from '../constants';
 import { Clock } from './widgets/ClockWidget';
-import { Pomodoro } from './widgets/PomodoroWidget';
+import { Timer } from './widgets/TimerWidget';
 import { Notes } from './widgets/NotesWidget';
 import MusicWidget from './widgets/MusicWidget';
 import RadioWidget from './widgets/RadioWidget';
@@ -11,6 +11,7 @@ interface GridProps {
   boxes: GridBox[];
   editMode: boolean;
   isDragging: boolean;
+  isDraggingWidget: boolean;
   dragStartBox: string | null;
   dragOverBox: string | null;
   bounds: { minX: number; maxX: number; minY: number; maxY: number };
@@ -35,7 +36,7 @@ interface GridProps {
   onAssignWidget: (boxId: string) => void;
   onAssignWidgetByDrag?: (boxId: string, widgetType: string) => void;
   onClockWidgetClick: (boxId: string) => void;
-  onPomodoroWidgetClick: (boxId: string) => void;
+  onTimerWidgetClick: (boxId: string) => void;
   onNotesWidgetClick: () => void;
   onMusicWidgetClick: () => void;
   onRadioWidgetClick: () => void;
@@ -63,6 +64,7 @@ const Grid: React.FC<GridProps> = ({
   boxes,
   editMode,
   isDragging,
+  isDraggingWidget,
   dragStartBox,
   dragOverBox,
   bounds,
@@ -77,7 +79,7 @@ const Grid: React.FC<GridProps> = ({
   onAssignWidget,
   onAssignWidgetByDrag,
   onClockWidgetClick,
-  onPomodoroWidgetClick,
+  onTimerWidgetClick,
   onNotesWidgetClick,
   onMusicWidgetClick,
   onRadioWidgetClick,
@@ -130,8 +132,8 @@ const Grid: React.FC<GridProps> = ({
     switch (box.widget.type) {
       case 'clock':
         return <Clock size={widgetSize} />;
-      case 'pomodoro':
-        return <Pomodoro size={widgetSize} />;
+      case 'timer':
+        return <Timer size={widgetSize} editMode={editMode} />;
       case 'notes':
         return <Notes size={widgetSize} />;
       case 'music':
@@ -153,8 +155,8 @@ const Grid: React.FC<GridProps> = ({
     } else if (box.widget) {
       if (box.widget.type === 'clock') {
         onClockWidgetClick(box.id);
-      } else if (box.widget.type === 'pomodoro') {
-        onPomodoroWidgetClick(box.id);
+      } else if (box.widget.type === 'timer') {
+        onTimerWidgetClick(box.id);
       } else if (box.widget.type === 'notes') {
         onNotesWidgetClick();
       } else if (box.widget.type === 'music') {
@@ -171,17 +173,22 @@ const Grid: React.FC<GridProps> = ({
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'copy';
+    // Allow drop operation in non-edit mode for widget replacement
+    if (!editMode) {
+      e.dataTransfer.dropEffect = 'copy';
+    } else {
+      e.dataTransfer.dropEffect = 'none';
+    }
   };
 
   const handleDrop = (e: React.DragEvent, boxId: string) => {
     e.preventDefault();
     const widgetType = e.dataTransfer.getData('widget-type');
     if (widgetType && !editMode && onAssignWidgetByDrag) {
-      // Find the box and check if it doesn't already have a widget
+      // Find the box - allow widget replacement by removing the widget check
       const box = boxes.find((b) => b.id === boxId);
-      if (box && !box.widget) {
-        // Trigger widget assignment with specific type
+      if (box) {
+        // Trigger widget assignment with specific type (will replace existing widget if any)
         onAssignWidgetByDrag(boxId, widgetType);
       }
     }
@@ -301,6 +308,11 @@ const Grid: React.FC<GridProps> = ({
                 ${assignmentMode.active && !box.widget ? 'assignment-glow' : ''}
                 ${assignmentMode.active && box.widget ? 'opacity-50' : ''}
                 ${explodingBoxId === box.id ? 'animate-explode' : ''}
+                ${
+                  isDraggingWidget && !editMode
+                    ? 'ring-2 ring-green-400 ring-opacity-50'
+                    : ''
+                }
               `}
               style={{
                 backgroundColor: box.color || '#ffffff',

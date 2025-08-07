@@ -6,7 +6,7 @@ export interface GridBox {
   height: number;
   color?: string;
   widget?: {
-    type: 'clock' | 'pomodoro' | 'notes' | 'music' | 'radio';
+    type: 'clock' | 'timer' | 'notes' | 'music' | 'radio';
     data?: Record<string, unknown>;
   };
 }
