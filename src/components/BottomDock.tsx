@@ -1,5 +1,5 @@
 import { Clock, Timer, SquarePen, AudioLines, Radio } from 'lucide-react';
-import { Tooltip, TooltipProvider } from './Tooltip';
+import { Tooltip, TooltipProvider } from './ui/Tooltip';
 
 interface BottomDockProps {
   editMode?: boolean;

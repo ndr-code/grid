@@ -1,4 +1,4 @@
-import { AVAILABLE_COLORS } from '../constants';
+import { AVAILABLE_COLORS } from '../../constants';
 
 interface ColorPickerProps {
   visible: boolean;

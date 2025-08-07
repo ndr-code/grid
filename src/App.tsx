@@ -5,10 +5,10 @@ import { BOX_SIZE, GAP } from './constants';
 
 // Import components
 import { ControlButtons } from './components/ControlButtons';
-import { ConfirmDialog } from './components/ConfirmDialog';
-import { ContextMenu } from './components/ContextMenu';
+import { ConfirmDialog } from './components/ui/ConfirmDialog';
+import { ContextMenu } from './components/ui/ContextMenu';
 import { WidgetSelectionDialog } from './components/WidgetSelectionDialog';
-import { ColorPicker } from './components/ColorPicker';
+import { ColorPicker } from './components/ui/ColorPicker';
 import Grid from './components/Grid';
 import { ClockDialog } from './components/ClockDialog';
 import { PomodoroDialog } from './components/PomodoroDialog';
