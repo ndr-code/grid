@@ -2,7 +2,7 @@ import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Pomodoro } from './Pomodoro';
+import { Pomodoro } from './PomodoroWidget';
 
 interface PomodoroDialogProps {
   open: boolean;
