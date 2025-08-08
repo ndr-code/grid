@@ -1,4 +1,4 @@
-import type { GridBox } from '../../types/types';
+import type { GridBox } from '../../types';
 
 interface ContextMenuProps {
   visible: boolean;
