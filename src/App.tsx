@@ -15,6 +15,7 @@ import { TimerDialog } from './components/widgets/TimerDialog';
 import { NotesDialog } from './components/widgets/NotesDialog';
 import { MusicDialog } from './components/widgets/MusicDialog';
 import { RadioDialog } from './components/widgets/RadioDialog';
+import { BookmarkDialog } from './components/BookmarkDialog';
 import { BottomDock } from './components/navigation/BottomDock';
 import { MotivationalQuotes } from './components/MotivationalQuotes';
 
@@ -76,6 +77,7 @@ function App() {
     assignWidgetToBox,
     deleteWidget,
     directAssignWidget,
+    directAssignWidgetWithData,
     startWidgetDrag,
     endWidgetDrag,
     handleWidgetDragEnterGrid,
@@ -100,6 +102,28 @@ function App() {
   const [showNotesDialog, setShowNotesDialog] = useState(false);
   const [showMusicDialog, setShowMusicDialog] = useState(false);
   const [showRadioDialog, setShowRadioDialog] = useState(false);
+  const [showBookmarkDialog, setShowBookmarkDialog] = useState(false);
+  const [selectedBookmarkBoxId, setSelectedBookmarkBoxId] = useState<
+    string | null
+  >(null);
+  const [pendingBookmarkUrl, setPendingBookmarkUrl] = useState<string | null>(
+    null
+  );
+  const handleAssignWidget = (boxId: string) => {
+    if (
+      assignmentMode.active &&
+      assignmentMode.widgetType === 'bookmark' &&
+      pendingBookmarkUrl
+    ) {
+      // Custom assignment for bookmark widgets with URL
+      directAssignWidgetWithData(boxId, 'bookmark', {
+        url: pendingBookmarkUrl,
+      });
+      setPendingBookmarkUrl(null);
+    } else {
+      assignWidgetToBox(boxId);
+    }
+  };
   const [isMusicMinimized, setIsMusicMinimized] = useState(false);
   const [showWidgetSelectionDialog, setShowWidgetSelectionDialog] =
     useState(false);
@@ -125,7 +149,8 @@ function App() {
       widgetType === 'timer' ||
       widgetType === 'notes' ||
       widgetType === 'music' ||
-      widgetType === 'radio'
+      widgetType === 'radio' ||
+      widgetType === 'bookmark'
     ) {
       startAssignmentMode(widgetType);
       // Assign immediately without delay since assignment mode is now active
@@ -195,7 +220,7 @@ function App() {
 
   // Handle widget selection from dialog
   const handleSelectWidget = (
-    widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio'
+    widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio' | 'bookmark'
   ) => {
     if (selectedBoxIdForWidget) {
       // Directly assign widget to the selected box without using assignment mode
@@ -284,7 +309,7 @@ function App() {
           explodingBoxId={explodingBoxId}
           invalidMergeTarget={invalidMergeTarget}
           onAddBox={addBox}
-          onAssignWidget={assignWidgetToBox}
+          onAssignWidget={handleAssignWidget}
           onAssignWidgetByDrag={handleAssignWidgetByDrag}
           onWidgetDragEnterGrid={handleWidgetDragEnterGrid}
           onWidgetDragLeaveGrid={handleWidgetDragLeaveGrid}
@@ -315,6 +340,24 @@ function App() {
           onRadioWidgetClick={() => {
             if (!editMode) {
               setShowRadioDialog(true);
+            }
+          }}
+          onBookmarkWidgetClick={() => {
+            if (!editMode) {
+              setShowBookmarkDialog(true);
+            }
+          }}
+          onBookmarkWidgetLeftClick={(_boxId, url) => {
+            if (!editMode) {
+              // Left click: open URL in new tab
+              window.open(url, '_blank');
+            }
+          }}
+          onBookmarkWidgetRightClick={(_e, boxId) => {
+            if (!editMode) {
+              // Right click: show context menu (edit, change color, etc.)
+              setSelectedBookmarkBoxId(boxId);
+              setShowBookmarkDialog(true);
             }
           }}
           onMouseDown={(e, boxId) => {
@@ -458,6 +501,26 @@ function App() {
         />
         <NotesDialog open={showNotesDialog} onOpenChange={setShowNotesDialog} />
         <RadioDialog open={showRadioDialog} onOpenChange={setShowRadioDialog} />
+        <BookmarkDialog
+          open={showBookmarkDialog}
+          onOpenChange={setShowBookmarkDialog}
+          onAssignToGrid={(url) => {
+            // Store the URL for later assignment
+            setPendingBookmarkUrl(url);
+            startAssignmentMode('bookmark');
+          }}
+          onRemoveWidget={() => {
+            if (selectedBookmarkBoxId) {
+              deleteWidget(selectedBookmarkBoxId);
+              setSelectedBookmarkBoxId(null);
+            }
+          }}
+          onEditBookmark={(boxId: string, newUrl: string) => {
+            // Edit existing bookmark URL
+            directAssignWidgetWithData(boxId, 'bookmark', { url: newUrl });
+          }}
+          allBoxes={boxes}
+        />
         <MusicDialog
           open={showMusicDialog}
           onOpenChange={setShowMusicDialog}
@@ -509,6 +572,12 @@ function App() {
         onRadioClick={() => {
           if (!editMode) {
             setShowRadioDialog(true);
+          }
+        }}
+        onBookmarkClick={() => {
+          if (!editMode) {
+            setSelectedBookmarkBoxId(null);
+            setShowBookmarkDialog(true);
           }
         }}
       />

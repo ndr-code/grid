@@ -1,35 +1,10 @@
 import { motion } from 'framer-motion';
 import { useGlobalTime } from '../../hooks';
+import type { BaseWidgetProps } from '../../types/types';
+import { parseGridSize } from '../../utils/widgetUtils';
 
-interface ClockProps {
-  size?:
-    | '1x1'
-    | '1x2'
-    | '1x3'
-    | '1x4'
-    | '1x5'
-    | '2x1'
-    | '2x2'
-    | '2x3'
-    | '2x4'
-    | '2x5'
-    | '3x1'
-    | '3x2'
-    | '3x3'
-    | '3x4'
-    | '3x5'
-    | '4x1'
-    | '4x2'
-    | '4x3'
-    | '4x4'
-    | '4x5'
-    | '5x1'
-    | '5x2'
-    | '5x3'
-    | '5x4'
-    | '5x5';
+interface ClockProps extends BaseWidgetProps {
   showDate?: boolean;
-  className?: string;
 }
 
 export const Clock = ({
@@ -38,12 +13,6 @@ export const Clock = ({
   className = '',
 }: ClockProps) => {
   const currentTime = useGlobalTime();
-
-  // Helper function to parse grid dimensions from size string
-  const parseGridSize = (gridSize: string) => {
-    const [w, h] = gridSize.split('x').map(Number);
-    return { width: w, height: h };
-  };
 
   const { width: gridWidth, height: gridHeight } = parseGridSize(size);
 

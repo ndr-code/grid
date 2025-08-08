@@ -1,4 +1,4 @@
-import type { GridBox } from '../types';
+import type { GridBox } from '../types/types';
 
 export const getBounds = (boxes: GridBox[]) => {
   if (boxes.length === 0) return { minX: 0, maxX: 0, minY: 0, maxY: 0 };

@@ -1,118 +1,91 @@
 import { motion } from 'framer-motion';
 import { SquarePen } from 'lucide-react';
+import type { BaseWidgetProps } from '../../types/types';
+import {
+  parseGridSize,
+  getIconSize,
+  getTextSize,
+  shouldShowText,
+} from '../../utils/widgetUtils';
 
-interface NotesProps {
-  size?:
-    | '1x1'
-    | '1x2'
-    | '1x3'
-    | '1x4'
-    | '1x5'
-    | '2x1'
-    | '2x2'
-    | '2x3'
-    | '2x4'
-    | '2x5'
-    | '3x1'
-    | '3x2'
-    | '3x3'
-    | '3x4'
-    | '3x5'
-    | '4x1'
-    | '4x2'
-    | '4x3'
-    | '4x4'
-    | '4x5'
-    | '5x1'
-    | '5x2'
-    | '5x3'
-    | '5x4'
-    | '5x5';
-  className?: string;
+interface NotesProps extends BaseWidgetProps {
+  // Notes data
+  notes?: Array<{
+    id: string;
+    title: string;
+    content: string;
+    createdAt: Date;
+  }>;
+
+  // Notes count display
+  showNotesCount?: boolean;
+  maxDisplayCount?: number;
+
+  // Notes preview
+  showPreview?: boolean;
+  previewLength?: number;
+
+  // Notes management callbacks
+  onAddNote?: (note: { title: string; content: string }) => void;
+  onEditNote?: (
+    noteId: string,
+    note: { title: string; content: string }
+  ) => void;
+  onDeleteNote?: (noteId: string) => void;
+
+  // Display preferences
+  showAddButton?: boolean;
+  showLastModified?: boolean;
+
+  // Widget state
+  editMode?: boolean;
 }
 
-export const Notes = ({ size = '2x2', className = '' }: NotesProps) => {
-  // Helper function to parse grid dimensions from size string
-  const parseGridSize = (gridSize: string) => {
-    const [w, h] = gridSize.split('x').map(Number);
-    return { width: w, height: h };
+export const Notes = ({
+  size = '2x2',
+  className = '',
+  notes = [],
+  showNotesCount = true,
+  showPreview = false,
+  previewLength = 50,
+  showLastModified = false,
+  editMode = false,
+  onClick,
+}: NotesProps) => {
+  const dimensions = parseGridSize(size);
+  const iconSize = getIconSize(dimensions);
+  const textSize = getTextSize(dimensions);
+  const showText = shouldShowText(dimensions);
+
+  // Get the most recent note for preview
+  const latestNote =
+    notes.length > 0
+      ? notes.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0]
+      : null;
+
+  const truncateText = (text: string, maxLength: number) => {
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + '...'
+      : text;
   };
 
-  const { width: gridWidth, height: gridHeight } = parseGridSize(size);
-  const totalArea = gridWidth * gridHeight;
-
-  const getIconSize = () => {
-    const maxDimension = Math.max(gridWidth, gridHeight);
-
-    // 1x1 - minimal display
-    if (gridWidth === 1 && gridHeight === 1) return 24;
-
-    // 1xN or Nx1 - compact display
-    if (gridWidth === 1 || gridHeight === 1) return 24;
-
-    // 2x2 - standard size
-    if (gridWidth === 2 && gridHeight === 2) return 24;
-
-    // 2x3, 3x2 - medium size
-    if (totalArea >= 6 && totalArea <= 8 && maxDimension <= 3) return 32;
-
-    // 3x3, 3x4, 4x3 - large size
-    if (totalArea >= 9 && totalArea <= 12) return 48;
-
-    // 4x4+ - extra large
-    if (totalArea >= 16) {
-      if (totalArea >= 25) return 80; // 5x5+
-      if (totalArea >= 20) return 72; // 4x5, 5x4
-      return 64; // 4x4
-    }
-
-    return 32; // default
-  };
-
-  const getTextSize = () => {
-    // 1x1 - no text
-    if (gridWidth === 1 && gridHeight === 1) return '';
-
-    // 1xN or Nx1 - minimal text
-    if (gridWidth === 1 || gridHeight === 1) return 'text-xs';
-
-    // 2x2 - small text
-    if (gridWidth === 2 && gridHeight === 2) return 'text-sm';
-
-    // 2x3, 3x2 - base text
-    if (totalArea >= 6 && totalArea <= 8) return 'text-base';
-
-    // 3x3, 3x4, 4x3 - large text
-    if (totalArea >= 9 && totalArea <= 12) return 'text-lg';
-
-    // 4x4+ - extra large text
-    if (totalArea >= 16) {
-      if (totalArea >= 25) return 'text-4xl'; // 5x5+
-      if (totalArea >= 20) return 'text-3xl'; // 4x5, 5x4
-      return 'text-2xl'; // 4x4
-    }
-
-    return 'text-base'; // default
-  };
-
-  const shouldShowText = () => {
-    // Don't show text for 1x1, 1x2, or 2x1
-    if (gridWidth === 1 && gridHeight === 1) return false; // 1x1
-    if (gridWidth === 1 && gridHeight === 2) return false; // 1x2
-    if (gridWidth === 2 && gridHeight === 1) return false; // 2x1
-    return true; // Show text for all other sizes
-  };
-
-  const getIcon = () => {
-    const iconSize = getIconSize();
-
-    // Always use SquarePen icon for consistency
-    return <SquarePen size={iconSize} className='text-gray-900' />;
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(date));
   };
 
   return (
     <motion.div
-      className={`flex items-center justify-center text-gray-800 ${className}`}
+      className={`flex items-center justify-center text-gray-800 ${
+        !editMode ? 'cursor-pointer hover:bg-white/10' : 'cursor-default'
+      } rounded-lg transition-colors duration-200 ${className}`}
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -120,12 +93,35 @@ export const Notes = ({ size = '2x2', className = '' }: NotesProps) => {
         width: '100%',
         height: '100%',
       }}
+      onClick={!editMode ? onClick : undefined}
     >
-      <div className='flex flex-col items-center justify-center space-y-1'>
-        {getIcon()}
-        {shouldShowText() && (
+      <div className='flex flex-col items-center justify-center space-y-1 p-2 relative'>
+        {/* Edit mode indicator */}
+        {editMode && (
+          <div className='absolute top-0 right-0 w-2 h-2 bg-orange-400 rounded-full opacity-60'></div>
+        )}
+
+        {/* Icon and count */}
+        <div className='flex items-center space-x-1'>
+          <SquarePen
+            size={iconSize}
+            className={`${
+              editMode ? 'text-gray-500' : 'text-gray-900'
+            } transition-colors duration-200`}
+          />
+          {showNotesCount && notes.length > 0 && !editMode && (
+            <span className='text-xs bg-blue-500 text-white rounded-full px-1.5 py-0.5 min-w-[1.25rem] text-center'>
+              {notes.length}
+            </span>
+          )}
+        </div>
+
+        {/* Widget title */}
+        {showText && (
           <motion.span
-            className={`font-medium text-gray-900 text-center leading-tight ${getTextSize()}`}
+            className={`font-medium ${
+              editMode ? 'text-gray-600' : 'text-gray-900'
+            } text-center leading-tight ${textSize} transition-colors duration-200`}
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.2 }}
@@ -133,6 +129,48 @@ export const Notes = ({ size = '2x2', className = '' }: NotesProps) => {
             Notes
           </motion.span>
         )}
+
+        {/* Preview content for larger widgets */}
+        {showPreview &&
+          latestNote &&
+          dimensions.width >= 3 &&
+          dimensions.height >= 2 &&
+          !editMode && (
+            <motion.div
+              className='text-center space-y-1'
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.2 }}
+            >
+              <div className='text-xs font-medium text-gray-800 truncate max-w-full'>
+                {truncateText(latestNote.title || 'Untitled', 20)}
+              </div>
+              <div className='text-2xs text-gray-600 leading-tight'>
+                {truncateText(latestNote.content, previewLength)}
+              </div>
+              {showLastModified && (
+                <div className='text-2xs text-gray-500'>
+                  {formatDate(latestNote.createdAt)}
+                </div>
+              )}
+            </motion.div>
+          )}
+
+        {/* Empty state for larger widgets */}
+        {notes.length === 0 &&
+          dimensions.width >= 2 &&
+          dimensions.height >= 2 && (
+            <motion.div
+              className='text-center'
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.2 }}
+            >
+              <div className='text-xs text-gray-500 leading-tight'>
+                No notes yet
+              </div>
+            </motion.div>
+          )}
       </div>
     </motion.div>
   );

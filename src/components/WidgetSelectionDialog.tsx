@@ -1,13 +1,20 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Timer, StickyNote, AudioLines, Radio } from 'lucide-react';
+import {
+  Clock,
+  Timer,
+  StickyNote,
+  AudioLines,
+  Radio,
+  Bookmark,
+} from 'lucide-react';
 
 interface WidgetSelectionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelectWidget: (
-    widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio'
+    widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio' | 'bookmark'
   ) => void;
 }
 
@@ -17,7 +24,7 @@ export const WidgetSelectionDialog = ({
   onSelectWidget,
 }: WidgetSelectionDialogProps) => {
   const handleSelectWidget = (
-    widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio'
+    widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio' | 'bookmark'
   ) => {
     onSelectWidget(widgetType);
     onOpenChange(false);
@@ -58,6 +65,13 @@ export const WidgetSelectionDialog = ({
       icon: Radio,
       color: 'bg-red-500 hover:bg-red-600',
       description: 'Radio player widget',
+    },
+    {
+      type: 'bookmark' as const,
+      name: 'Bookmark',
+      icon: Bookmark,
+      color: 'bg-orange-500 hover:bg-orange-600',
+      description: 'Bookmark URL widget',
     },
   ];
 

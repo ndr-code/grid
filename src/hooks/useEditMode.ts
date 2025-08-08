@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { GridBox, Position } from '../types';
+import type { GridBox, Position } from '../types/types';
 
 // Constants
 const MAX_GRID_SIZE = 7;
@@ -81,7 +81,14 @@ export const useEditMode = () => {
   });
   const [assignmentMode, setAssignmentMode] = useState<{
     active: boolean;
-    widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio' | null;
+    widgetType:
+      | 'clock'
+      | 'timer'
+      | 'notes'
+      | 'music'
+      | 'radio'
+      | 'bookmark'
+      | null;
   }>({
     active: false,
     widgetType: null,
@@ -971,7 +978,9 @@ export const useEditMode = () => {
 
   // Assignment mode functions
   const startAssignmentMode = useCallback(
-    (widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio') => {
+    (
+      widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio' | 'bookmark'
+    ) => {
       setAssignmentMode({ active: true, widgetType });
     },
     []
@@ -1013,12 +1022,28 @@ export const useEditMode = () => {
   const directAssignWidget = useCallback(
     (
       boxId: string,
-      widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio'
+      widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio' | 'bookmark'
     ) => {
       const newBoxes = boxes.map((box) =>
         box.id === boxId
           ? { ...box, widget: { type: widgetType, data: {} } }
           : box
+      );
+
+      setBoxes(newBoxes);
+      saveToHistory(newBoxes);
+    },
+    [boxes, saveToHistory]
+  );
+
+  const directAssignWidgetWithData = useCallback(
+    (
+      boxId: string,
+      widgetType: 'clock' | 'timer' | 'notes' | 'music' | 'radio' | 'bookmark',
+      data: Record<string, unknown> = {}
+    ) => {
+      const newBoxes = boxes.map((box) =>
+        box.id === boxId ? { ...box, widget: { type: widgetType, data } } : box
       );
 
       setBoxes(newBoxes);
@@ -1050,7 +1075,8 @@ export const useEditMode = () => {
         draggedWidgetType === 'timer' ||
         draggedWidgetType === 'notes' ||
         draggedWidgetType === 'music' ||
-        draggedWidgetType === 'radio'
+        draggedWidgetType === 'radio' ||
+        draggedWidgetType === 'bookmark'
       ) {
         setAssignmentMode({ active: true, widgetType: draggedWidgetType });
       }
@@ -1133,6 +1159,7 @@ export const useEditMode = () => {
     assignWidgetToBox,
     deleteWidget,
     directAssignWidget,
+    directAssignWidgetWithData,
 
     // Widget drag handlers
     startWidgetDrag,

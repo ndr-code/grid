@@ -1,4 +1,11 @@
-import { Clock, Timer, SquarePen, AudioLines, Radio } from 'lucide-react';
+import {
+  Clock,
+  Timer,
+  SquarePen,
+  AudioLines,
+  Radio,
+  Bookmark,
+} from 'lucide-react';
 import { Tooltip, TooltipProvider } from '../ui/Tooltip';
 
 interface BottomDockProps {
@@ -8,6 +15,7 @@ interface BottomDockProps {
   onNotesClick: () => void;
   onMusicClick: () => void;
   onRadioClick: () => void;
+  onBookmarkClick: () => void;
   onWidgetDragStart?: (widgetType: string) => void;
   onWidgetDragEnd?: () => void;
 }
@@ -19,6 +27,7 @@ export const BottomDock = ({
   onNotesClick,
   onMusicClick,
   onRadioClick,
+  onBookmarkClick,
   onWidgetDragStart,
   onWidgetDragEnd,
 }: BottomDockProps) => {
@@ -131,6 +140,24 @@ export const BottomDock = ({
                   : 'cursor-pointer hover:scale-110 hover:-translate-y-1'
               }`}
               onClick={editMode ? undefined : onRadioClick}
+            />
+          </div>
+        </Tooltip>
+
+        <Tooltip content={editMode ? 'Disabled in Edit Mode' : 'Bookmark'}>
+          <div
+            draggable={!editMode}
+            onDragStart={(e) => handleDragStart(e, 'bookmark')}
+            onDragEnd={handleDragEnd}
+            className='inline-block'
+          >
+            <Bookmark
+              className={`w-6 h-6 text-white transition-all duration-200 ${
+                editMode
+                  ? 'opacity-20 cursor-not-allowed'
+                  : 'cursor-pointer hover:scale-110 hover:-translate-y-1'
+              }`}
+              onClick={editMode ? undefined : onBookmarkClick}
             />
           </div>
         </Tooltip>

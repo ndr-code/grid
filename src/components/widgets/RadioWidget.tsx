@@ -1,120 +1,76 @@
 import React from 'react';
 import { Radio } from 'lucide-react';
 import { motion } from 'framer-motion';
+import type { BaseWidgetProps } from '../../types/types';
+import {
+  parseGridSize,
+  getIconSize,
+  getTextSize,
+  shouldShowText,
+} from '../../utils/widgetUtils';
 
-export interface RadioWidgetProps {
-  size?:
-    | '1x1'
-    | '1x2'
-    | '1x3'
-    | '1x4'
-    | '1x5'
-    | '2x1'
-    | '2x2'
-    | '2x3'
-    | '2x4'
-    | '2x5'
-    | '3x1'
-    | '3x2'
-    | '3x3'
-    | '3x4'
-    | '3x5'
-    | '4x1'
-    | '4x2'
-    | '4x3'
-    | '4x4'
-    | '4x5'
-    | '5x1'
-    | '5x2'
-    | '5x3'
-    | '5x4'
-    | '5x5';
-  className?: string;
-  onClick?: () => void;
+export interface RadioWidgetProps extends BaseWidgetProps {
+  // Radio station information
+  station?: {
+    id: string;
+    name: string;
+    frequency?: string;
+    streamUrl: string;
+    embedUrl?: string;
+    logo?: string;
+    genre?: string;
+    description?: string;
+  };
+
+  // Radio playback state
+  isPlaying?: boolean;
+  isLoading?: boolean;
+  volume?: number;
+  isMuted?: boolean;
+
+  // Radio controls callbacks
+  onPlay?: () => void;
+  onStop?: () => void;
+  onVolumeChange?: (volume: number) => void;
+  onMuteToggle?: () => void;
+  onStationChange?: (stationId: string) => void;
+
+  // Display preferences
+  showStationName?: boolean;
+  showFrequency?: boolean;
+  showPlayButton?: boolean;
+  showVolumeControl?: boolean;
+  showLiveIndicator?: boolean;
+
+  // Popup/external player options
+  openInPopup?: boolean;
+  popupFeatures?: string;
+
+  // Widget state
+  editMode?: boolean;
 }
 
-const RadioWidget: React.FC<RadioWidgetProps> = ({ size = '2x2', onClick }) => {
-  // Helper function to parse grid dimensions from size string
-  const parseGridSize = (gridSize: string) => {
-    const [w, h] = gridSize.split('x').map(Number);
-    return { width: w, height: h };
-  };
-
-  const { width: gridWidth, height: gridHeight } = parseGridSize(size);
-  const totalArea = gridWidth * gridHeight;
-
-  const getIconSize = () => {
-    const maxDimension = Math.max(gridWidth, gridHeight);
-
-    // 1x1 - minimal display
-    if (gridWidth === 1 && gridHeight === 1) return 24;
-
-    // 1xN or Nx1 - compact display
-    if (gridWidth === 1 || gridHeight === 1) return 24;
-
-    // 2x2 - standard size
-    if (gridWidth === 2 && gridHeight === 2) return 32;
-
-    // 2x3, 3x2 - medium size
-    if (totalArea >= 6 && totalArea <= 8 && maxDimension <= 3) return 32;
-
-    // 3x3, 3x4, 4x3 - large size
-    if (totalArea >= 9 && totalArea <= 12) return 48;
-
-    // 4x4+ - extra large
-    if (totalArea >= 16) {
-      if (totalArea >= 25) return 80; // 5x5+
-      if (totalArea >= 20) return 72; // 4x5, 5x4
-      return 64; // 4x4
-    }
-
-    return 32; // default
-  };
-
-  const getTextSize = () => {
-    // 1x1 - no text
-    if (gridWidth === 1 && gridHeight === 1) return '';
-
-    // 1xN or Nx1 - minimal text
-    if (gridWidth === 1 || gridHeight === 1) return 'text-xs';
-
-    // 2x2 - small text
-    if (gridWidth === 2 && gridHeight === 2) return 'text-base';
-
-    // 2x3, 3x2 - base text
-    if (totalArea >= 6 && totalArea <= 8) return 'text-base';
-
-    // 3x3, 3x4, 4x3 - large text
-    if (totalArea >= 9 && totalArea <= 12) return 'text-lg';
-
-    // 4x4+ - extra large text
-    if (totalArea >= 16) {
-      if (totalArea >= 25) return 'text-4xl'; // 5x5+
-      if (totalArea >= 20) return 'text-3xl'; // 4x5, 5x4
-      return 'text-2xl'; // 4x4
-    }
-
-    return 'text-base'; // default
-  };
-
-  const shouldShowText = () => {
-    // Don't show text for 1x1, 1x2, or 2x1
-    if (gridWidth === 1 && gridHeight === 1) return false; // 1x1
-    if (gridWidth === 1 && gridHeight === 2) return false; // 1x2
-    if (gridWidth === 2 && gridHeight === 1) return false; // 2x1
-    return true; // Show text for all other sizes
-  };
-
-  const getIcon = () => {
-    const iconSize = getIconSize();
-
-    // Always use Radio icon for consistency
-    return <Radio size={iconSize} className='text-gray-900' />;
-  };
+const RadioWidget: React.FC<RadioWidgetProps> = ({
+  size = '2x2',
+  onClick,
+  station,
+  isPlaying = false,
+  isLoading = false,
+  showStationName = true,
+  showFrequency = false,
+  showLiveIndicator = true,
+  editMode = false,
+}) => {
+  const dimensions = parseGridSize(size);
+  const iconSize = getIconSize(dimensions);
+  const textSize = getTextSize(dimensions);
+  const showText = shouldShowText(dimensions);
 
   return (
     <motion.div
-      className='flex items-center justify-center text-gray-800 cursor-pointer hover:bg-white/10 rounded-lg transition-colors duration-200'
+      className={`flex items-center justify-center text-gray-800 ${
+        !editMode ? 'cursor-pointer hover:bg-white/10' : 'cursor-default'
+      } rounded-lg transition-colors duration-200`}
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -122,13 +78,46 @@ const RadioWidget: React.FC<RadioWidgetProps> = ({ size = '2x2', onClick }) => {
         width: '100%',
         height: '100%',
       }}
-      onClick={onClick}
+      onClick={!editMode ? onClick : undefined}
     >
-      <div className='flex flex-col items-center justify-center space-y-1'>
-        {getIcon()}
-        {shouldShowText() && (
+      <div className='flex flex-col items-center justify-center space-y-1 p-2 relative'>
+        {/* Edit mode indicator */}
+        {editMode && (
+          <div className='absolute top-0 right-0 w-2 h-2 bg-orange-400 rounded-full opacity-60'></div>
+        )}
+
+        {/* Live indicator */}
+        {showLiveIndicator && isPlaying && !editMode && (
+          <div className='absolute top-0 left-0 w-2 h-2 bg-red-500 rounded-full animate-pulse'></div>
+        )}
+
+        {/* Icon with loading/playing state */}
+        <div className='flex items-center space-x-1'>
+          <div className='relative'>
+            <Radio
+              size={iconSize}
+              className={`${
+                editMode
+                  ? 'text-gray-500'
+                  : isPlaying
+                  ? 'text-blue-600'
+                  : 'text-gray-900'
+              } transition-colors duration-200`}
+            />
+            {isLoading && !editMode && (
+              <div className='absolute inset-0 flex items-center justify-center'>
+                <div className='w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin'></div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Widget title */}
+        {showText && (
           <motion.span
-            className={`font-medium text-gray-900 text-center leading-tight ${getTextSize()}`}
+            className={`font-medium ${
+              editMode ? 'text-gray-600' : 'text-gray-900'
+            } text-center leading-tight ${textSize} transition-colors duration-200`}
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.2 }}
@@ -136,6 +125,50 @@ const RadioWidget: React.FC<RadioWidgetProps> = ({ size = '2x2', onClick }) => {
             Radio
           </motion.span>
         )}
+
+        {/* Station info for larger widgets */}
+        {station &&
+          dimensions.width >= 3 &&
+          dimensions.height >= 2 &&
+          !editMode && (
+            <motion.div
+              className='text-center space-y-1'
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.2 }}
+            >
+              {showStationName && (
+                <div className='text-xs font-medium text-gray-800 truncate max-w-full'>
+                  {station.name}
+                </div>
+              )}
+              {showFrequency && station.frequency && (
+                <div className='text-2xs text-gray-600'>
+                  {station.frequency}
+                </div>
+              )}
+              {station.genre && (
+                <div className='text-2xs text-gray-500'>{station.genre}</div>
+              )}
+            </motion.div>
+          )}
+
+        {/* Default station info for medium widgets */}
+        {!station &&
+          dimensions.width >= 2 &&
+          dimensions.height >= 2 &&
+          !editMode && (
+            <motion.div
+              className='text-center'
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.2 }}
+            >
+              <div className='text-xs text-gray-500 leading-tight'>
+                JAK 101 FM
+              </div>
+            </motion.div>
+          )}
       </div>
     </motion.div>
   );

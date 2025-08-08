@@ -1,11 +1,12 @@
 import React from 'react';
-import type { GridBox, Position } from '../types';
+import type { GridBox, Position } from '../types/types';
 import { BOX_SIZE, GAP } from '../constants';
 import { Clock } from './widgets/ClockWidget';
 import { Timer } from './widgets/TimerWidget';
 import { Notes } from './widgets/NotesWidget';
 import MusicWidget from './widgets/MusicWidget';
 import RadioWidget from './widgets/RadioWidget';
+import BookmarkWidget from './widgets/BookmarkWidget';
 
 interface GridProps {
   boxes: GridBox[];
@@ -40,6 +41,9 @@ interface GridProps {
   onNotesWidgetClick: () => void;
   onMusicWidgetClick: () => void;
   onRadioWidgetClick: () => void;
+  onBookmarkWidgetClick: () => void;
+  onBookmarkWidgetLeftClick?: (boxId: string, url: string) => void;
+  onBookmarkWidgetRightClick?: (e: React.MouseEvent, boxId: string) => void;
   onMouseDown: (e: React.MouseEvent, boxId: string) => void;
   onContextMenu: (e: React.MouseEvent, boxId: string) => void;
   onShowContextMenu?: (e: React.MouseEvent, boxId: string) => void;
@@ -83,6 +87,9 @@ const Grid: React.FC<GridProps> = ({
   onNotesWidgetClick,
   onMusicWidgetClick,
   onRadioWidgetClick,
+  onBookmarkWidgetClick,
+  onBookmarkWidgetLeftClick,
+  onBookmarkWidgetRightClick,
   onMouseDown,
   onContextMenu,
   onShowContextMenu,
@@ -144,6 +151,30 @@ const Grid: React.FC<GridProps> = ({
         return (
           <RadioWidget size={widgetSize} onClick={() => onRadioWidgetClick()} />
         );
+      case 'bookmark': {
+        const bookmarkUrl =
+          (box.widget.data?.url as string) || 'https://example.com';
+        return (
+          <BookmarkWidget
+            size={widgetSize}
+            url={bookmarkUrl}
+            onLeftClick={() => {
+              if (onBookmarkWidgetLeftClick) {
+                onBookmarkWidgetLeftClick(box.id, bookmarkUrl);
+              } else {
+                // Default: open URL in new tab
+                window.open(bookmarkUrl, '_blank');
+              }
+            }}
+            onRightClick={(e) => {
+              if (onBookmarkWidgetRightClick) {
+                onBookmarkWidgetRightClick(e, box.id);
+              }
+            }}
+            onClick={() => onBookmarkWidgetClick()}
+          />
+        );
+      }
       default:
         return null;
     }
@@ -163,6 +194,8 @@ const Grid: React.FC<GridProps> = ({
         onMusicWidgetClick();
       } else if (box.widget.type === 'radio') {
         onRadioWidgetClick();
+      } else if (box.widget.type === 'bookmark') {
+        onBookmarkWidgetClick();
       }
     } else if (!editMode && !box.widget && onShowContextMenu) {
       // Show context menu for empty boxes in non-edit mode
