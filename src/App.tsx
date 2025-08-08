@@ -547,6 +547,12 @@ function App() {
             setShowClockDialog(true);
           }
         }}
+        onAnalogClockClick={() => {
+          if (!editMode) {
+            // TODO: Implement analog clock functionality
+            console.log('Analog Clock clicked');
+          }
+        }}
         onTimerClick={() => {
           if (!editMode) {
             setTimerDialogMode('assign');
@@ -557,6 +563,24 @@ function App() {
         onNotesClick={() => {
           if (!editMode) {
             setShowNotesDialog(true);
+          }
+        }}
+        onBookmarkClick={() => {
+          if (!editMode) {
+            setSelectedBookmarkBoxId(null);
+            setShowBookmarkDialog(true);
+          }
+        }}
+        onTodoListClick={() => {
+          if (!editMode) {
+            // TODO: Implement todo list functionality
+            console.log('Todo List clicked');
+          }
+        }}
+        onAmbientSoundClick={() => {
+          if (!editMode) {
+            // TODO: Implement ambient sound functionality
+            console.log('Ambient Sound clicked');
           }
         }}
         onMusicClick={() => {
@@ -572,12 +596,6 @@ function App() {
         onRadioClick={() => {
           if (!editMode) {
             setShowRadioDialog(true);
-          }
-        }}
-        onBookmarkClick={() => {
-          if (!editMode) {
-            setSelectedBookmarkBoxId(null);
-            setShowBookmarkDialog(true);
           }
         }}
       />
